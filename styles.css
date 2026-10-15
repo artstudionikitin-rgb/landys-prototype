@@ -903,3 +903,6 @@ h1 { font-size: clamp(22px, 1.9vw, 28px); white-space: nowrap; overflow: hidden;
 /* карточки появляются без затухания — только лёгкий сдвиг */
 @keyframes rise2 { from { transform: translateY(6px); } }
 .card { animation-name: rise2; }
+
+/* Land type раскрывается так же, как Service — от левого края поиска */
+#pop-land { left: 0; right: auto; }
