@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Land pros in Angelina County, TX · Landys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="styles.css?v=1792097718">
+</head>
+<body>
+
+<!-- ============ Шапка: логотип + составной поиск в стиле Airbnb ============ -->
+<div class="chrome" id="chrome">
+<header class="topbar">
+  <a class="logo" href="#" aria-label="Landys home">
+    <img src="https://static.wixstatic.com/media/701a20_cf3adcf082364ce3b7338ddc28bf079c~mv2.png" alt="Landys">
+  </a>
+
+  <div class="search" id="search">
+    <button class="seg" data-pop="service">
+      <span class="lbl">Service</span>
+      <span class="val" id="svcVal">All land pros</span>
+    </button>
+    <span class="sep"></span>
+    <button class="seg seg-where" data-pop="where">
+      <span class="lbl">Where</span>
+      <span class="val" id="whereVal">Angelina County, TX</span>
+    </button>
+    <span class="sep"></span>
+    <button class="seg" data-pop="land">
+      <span class="lbl">Land type</span>
+      <span class="val" id="landVal">Any land</span>
+    </button>
+    <button class="go" aria-label="Search"><i data-lucide="search"></i></button>
+
+    <!-- Поповер «Где»: штат → округ -->
+    <div class="pop pop-where" id="pop-where" hidden>
+      <div class="pop-col states">
+        <p class="pop-title">State</p>
+        <ul id="stateList"></ul>
+      </div>
+      <div class="pop-col counties">
+        <label class="pop-search"><i data-lucide="search"></i><input id="countyFilter" placeholder="Search counties in Texas"></label>
+        <ul id="countyList"></ul>
+      </div>
+    </div>
+    <div class="pop pop-list" id="pop-service" hidden><ul id="serviceList"></ul></div>
+    <div class="pop pop-list pop-land" id="pop-land" hidden><ul id="landList"></ul></div>
+  </div>
+
+  <!-- Мобильная версия поиска -->
+  <button class="msearch" id="msearch">
+    <i data-lucide="search"></i>
+    <span><b id="mWhere">Angelina County, TX</b><small id="mWhat">All land pros · Any land</small></span>
+  </button>
+
+  <nav class="top-actions">
+    <a class="ghost-link" href="#">Are you a pro?</a>
+    <button class="user-btn" aria-label="Account"><i data-lucide="menu"></i><span class="user-ava"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=96&h=96&fit=crop&crop=faces" alt=""></span></button>
+    <button class="btn btn-accent btn-start" data-open="request"><i data-lucide="sparkles"></i>Start your project</button>
+  </nav>
+</header>
+
+<!-- ============ Полоса категорий ============ -->
+<div class="catbar">
+  <div class="cats" id="cats"></div>
+  <button class="filters-btn" id="filtersBtn"><i data-lucide="sliders-horizontal"></i>Filters<span class="fcount" id="fcount" hidden></span></button>
+</div>
+</div>
+
+<!-- ============ Основная часть: список слева, карта справа ============ -->
+<main class="split" id="split">
+  <section class="list-pane" id="listPane">
+    <div class="list-head">
+      <h1 id="title">Land pros serving <em>Angelina County</em></h1>
+      <div class="list-meta">
+        <p class="sub" id="sub"></p>
+        <label class="sort">
+          <span>Sort:</span>
+          <select id="sort">
+            <option value="rec">Recommended</option>
+            <option value="rating">Top rated</option>
+            <option value="reply">Fastest reply</option>
+            <option value="nearby">Most local projects</option>
+          </select>
+          <i data-lucide="chevron-down"></i>
+        </label>
+      </div>
+    </div>
+
+    <div class="quick" id="quick">
+      <button class="qchip" data-q="top"><i data-lucide="award"></i>Top Pro</button>
+      <button class="qchip" data-q="verified"><i data-lucide="badge-check"></i>Verified</button>
+      <button class="qchip" data-q="fast"><i data-lucide="zap"></i>Replies &lt; 30 min</button>
+      <button class="qchip" data-q="guarantee"><i data-lucide="shield-check"></i>$3,000 Job Guarantee</button>
+    </div>
+
+    <!-- «Отправить топ-3» — главный конверсионный блок -->
+    <div class="match" id="match">
+      <div class="match-faces" id="matchFaces"></div>
+      <div class="match-copy">
+        <p class="match-kicker"><i data-lucide="sparkles"></i>Skip the browsing</p>
+        <p class="match-title">Describe your project once — we'll send it to the <b>top 3 matches</b>.</p>
+      </div>
+      <button class="btn btn-accent" data-open="top3">Send to top 3<i data-lucide="arrow-right"></i></button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <nav class="pager" id="pager" aria-label="Pages"></nav>
+
+    <div class="empty" id="empty" hidden>
+      <div class="empty-ill"><i data-lucide="binoculars"></i></div>
+      <h3 id="emptyTitle">No pros here yet</h3>
+      <p>Our Texas team will personally find you a trusted local pro in less than 48 hours.</p>
+      <div class="empty-actions">
+        <button class="btn btn-accent" data-open="request">Find me a pro</button>
+        <button class="btn btn-line" id="resetBtn">Clear filters</button>
+      </div>
+    </div>
+
+    <footer class="list-foot">
+      <div class="guarantee">
+        <i data-lucide="shield-check"></i>
+        <div><b>Landys Job Guarantee</b><span>Eligible projects are backed up to $3,000. <a href="#">Terms apply</a></span></div>
+      </div>
+      <p class="copy">© 2026 Landys · Land Pros, all in one place</p>
+    </footer>
+  </section>
+
+  <section class="map-pane" id="mapPane">
+    <div id="map"></div>
+
+    <div class="map-ctrl">
+      <button id="zin" aria-label="Zoom in"><i data-lucide="plus"></i></button>
+      <button id="zout" aria-label="Zoom out"><i data-lucide="minus"></i></button>
+      <button id="zfit" aria-label="Fit county"><i data-lucide="locate-fixed"></i></button>
+    </div>
+
+  </section>
+</main>
+
+<!-- Панель выбора нескольких подрядников -->
+<div class="tray" id="tray" hidden>
+  <div class="tray-faces" id="trayFaces"></div>
+  <div class="tray-copy"><b id="trayTitle">2 pros selected</b><span>Send one request — compare replies side by side</span></div>
+  <button class="tray-clear" id="trayClear">Clear</button>
+  <button class="btn btn-accent" data-open="picked">Send request<i data-lucide="arrow-right"></i></button>
+</div>
+
+<!-- Мобильный переключатель список / карта -->
+<button class="mtoggle" id="mtoggle"><i data-lucide="map"></i><span>Map</span></button>
+
+<!-- Модалка запроса -->
+<div class="modal" id="modal" hidden>
+  <div class="modal-back" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <button class="x" data-close aria-label="Close"><i data-lucide="x"></i></button>
+    <div class="sheet-body" id="sheetForm">
+      <p class="kicker" id="mKicker">Send to top 3</p>
+      <h2 id="mTitle">Tell pros about your project</h2>
+      <div class="recips" id="recips"></div>
+      <form id="reqForm">
+        <div class="field">
+          <span>What do you need?</span>
+          <div class="chips-pick" id="ptypes"></div>
+        </div>
+        <div class="row2">
+          <label class="field"><span>Acres</span><input type="number" min="1" placeholder="e.g. 25"></label>
+          <label class="field"><span>Land type</span><select id="mLand"></select></label>
+        </div>
+        <div class="field">
+          <span>When?</span>
+          <div class="seg-pick" id="when">
+            <button type="button" class="on"><i data-lucide="zap"></i><span>ASAP</span></button>
+            <button type="button"><i data-lucide="calendar-days"></i><span>1–3 months</span></button>
+            <button type="button"><i data-lucide="lightbulb"></i><span>Just planning</span></button>
+          </div>
+        </div>
+        <label class="field"><span>Details</span><textarea rows="3" placeholder="Clear 5 acres of pine & brush for a house pad, need a 300 ft driveway…"></textarea></label>
+        <div class="row2">
+          <label class="field"><span>Name</span><input placeholder="Your name"></label>
+          <label class="field"><span>Phone</span><input placeholder="(936) 000-0000"></label>
+        </div>
+        <button class="btn btn-accent btn-block" type="submit">Send request<i data-lucide="send"></i></button>
+        <p class="fine">Free · No obligation · Pros typically reply within 30 min</p>
+      </form>
+    </div>
+    <div class="sheet-body done" id="sheetDone" hidden>
+      <div class="done-ic"><i data-lucide="check"></i></div>
+      <h2>Request sent!</h2>
+      <p id="doneText">3 pros got your project. You'll get replies by text and email.</p>
+      <button class="btn btn-dark" data-close>Back to results</button>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js"></script>
+<script src="counties.js?v=1792097718"></script>
+<script src="data.js?v=1792097718"></script>
+<script src="app.js?v=1792097718"></script>
+</body>
+</html>
